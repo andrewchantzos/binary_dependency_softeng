@@ -7,8 +7,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -18,9 +20,13 @@ public class Watermark {
 	private static final int IMG_HEIGHT = 250;
 
 	
-	public void addTextWatermark(String text, File sourceImageFile, File destImageFile) {
+	public byte[] addTextWatermark(String text, byte[] imageInByte) {
 		try {
-			BufferedImage sourceImage = ImageIO.read(sourceImageFile);
+			
+			InputStream in = new ByteArrayInputStream(imageInByte);
+			BufferedImage sourceImage = ImageIO.read(in);
+			
+
 			BufferedImage resizedImage = resizeImage(sourceImage);
 			Graphics2D g2d = (Graphics2D) resizedImage.getGraphics();
 
@@ -40,7 +46,11 @@ public class Watermark {
 			// paints the textual watermark
 			g2d.drawString(text, centerX, centerY);
 
-			ImageIO.write(resizedImage, "png", destImageFile);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(sourceImage, "png", baos);
+			baos.flush();
+			imageInByte = baos.toByteArray();
+			baos.close();
 			g2d.dispose();
 
 			System.out.println("The tex watermark is added to the image.");
@@ -48,6 +58,7 @@ public class Watermark {
 		} catch (IOException ex) {
 			System.err.println(ex);
 		}
+		return imageInByte;
 	}
 
 	public BufferedImage resizeImage(BufferedImage originalImage) {
