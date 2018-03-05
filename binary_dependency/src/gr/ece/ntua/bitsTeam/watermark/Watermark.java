@@ -1,4 +1,5 @@
-package gr.ntua.ece.bitsTeam.watermark;
+package gr.ece.ntua.bitsTeam.watermark;
+
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -7,10 +8,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -20,14 +19,10 @@ public class Watermark {
 	private static final int IMG_HEIGHT = 250;
 
 	
-	public byte[] addTextWatermark(String text, byte[] imageInByte) {
+	public byte[] addTextWatermark(String text, BufferedImage sourceImageFile) {
+		byte[] imageInByte = null;
 		try {
-			
-			InputStream in = new ByteArrayInputStream(imageInByte);
-			BufferedImage sourceImage = ImageIO.read(in);
-			
-
-			BufferedImage resizedImage = resizeImage(sourceImage);
+			BufferedImage resizedImage = resizeImage(sourceImageFile);
 			Graphics2D g2d = (Graphics2D) resizedImage.getGraphics();
 
 			// initializes necessary graphic properties
@@ -47,9 +42,9 @@ public class Watermark {
 			g2d.drawString(text, centerX, centerY);
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(sourceImage, "png", baos);
-			baos.flush();
+			ImageIO.write(resizedImage, "png", baos);
 			imageInByte = baos.toByteArray();
+			baos.flush();
 			baos.close();
 			g2d.dispose();
 
